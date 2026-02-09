@@ -1,0 +1,4 @@
+1. Automatically identifying weak or broken links is difficult because a link may look valid but still be incorrect. I am not doing a full verification of links.
+2. Deciding which sections to merge or rewrite is unclear, so removing or merging content can affect the original meaning. I am not rewriting any sections. I am only identifying that there are too many sections.
+3. Counting sections correctly can be confusing when some lines are empty or incorrectly formatted, which may affect the overall structure. I am not sure what to do here.
+4. Approving changes automatically has a high risk because sometimes the system's suggestions may not be appropriate without human verification. I am simulating approval (“yes” or “no”) instead of asking for approval from a real user and showing what would happen after approval.
