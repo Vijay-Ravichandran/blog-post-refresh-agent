@@ -4,14 +4,36 @@ with open("blog_input.txt", "r", encoding="utf-8") as file:
 print (blog_text[:500])
 print ("Blog content loaded successfully")
 
+# I am adding a function here to count sections
+def count_sections(text): # here i am defining a function so i can reuse this block of code whenever to count sections
+    lines = text.split("\n")
+    count = 0
+    for line in lines:
+        if line.strip().startswith("#"):
+            count += 1
+    return count 
+
+# Basic test for section count
+test_text = "# Section 1\ncontent\n# Section 2\ncontent\n# Section 3\ncontent\n# Section 4\ncontent\n# Section 5\ncontent\n# Section 6\ncontent\n# Section 7\ncontent"
+assert count_sections(test_text) == 7
+print("Section counting test passed.")
+
 lines = blog_text.split("\n")
 
 sections = []
+current_section = [] # Adding this for content along with section title
 links = []
 
 for line in lines:
     if line.strip().startswith("#"):
-        sections.append(line.strip())
+        if current_section:  # save previous section
+            sections.append("\n".join(current_section))
+        current_section = [line.strip()]  # start new section with heading
+    else:
+        current_section.append(line.strip())  # add content to current section
+
+if current_section:
+    sections.append("\n".join(current_section))
 
 # Rule 1 - I am creating a simple link evaluation logic here - to access and usefulness
 
@@ -30,7 +52,7 @@ for line in lines:
 
 # Rule 2 - Bringing Structure clarity - refresh blog post should be <=6 sections and decide which is to keep, rewrite or leave unchanged 
 
-num_sections = len(sections)
+num_sections = count_sections(blog_text) # earlier I was just counting a lenght of list -> len(sections) now counting using a function
 print(f"Total sections found: {num_sections}")
 
 if num_sections > 6:
