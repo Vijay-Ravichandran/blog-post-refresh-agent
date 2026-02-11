@@ -34,19 +34,44 @@ num_sections = len(sections)
 print(f"Total sections found: {num_sections}")
 
 if num_sections > 6:
-    print("Warning: Too many sections detected")
-    print("Proposed action for extra sections:")
-    print("- Merge smaller sections if possible")
-    print("- Rewrite sections for clarity if needed")
-    print("- Leave some sections unchanged if they are already fine")
+
+# I am proposing to merge the last 2 sections instead of just printing the messages - to address concrete change to meet structual clarity requirement
+    
+    section1 = sections[-2]
+    section2 = sections[-1]
+
+    print("\nProposed Change:")
+    print(f"I want to merge '{section1}' and '{section2}'")
+    print("Reason: Blog has more than 6 sections, so merging will satisfy the rule.")
 
 # Rule 3 - Approval before taking action - for the corrections in sections before modifying, the system should know what needs to be modified or changed & why?
-    approval = "yes"
+    approval = input("\nDo you approve this change? (yes/no): ")
 
-    if approval == "yes":
-        print("Proceeding with proposed changes to sections")
+    if approval.lower() == "yes":
+        print("\nChange approved. Applying merge...")
+
+        # simple merge logic (removing last section heading)
+        blog_text = blog_text.replace(section2, "")
+
+        # Verfication part - merged section results to be displayed to ensure whether changes are reflected to adding this)
+        updated_lines = blog_text.split("\n")
+        updated_sections = []
+
+        for line in updated_lines:
+            if line.strip().startswith("#"):
+                updated_sections.append(line.strip())
+        
+        print("\nUpdated Results:")
+        print(f"Total sections found (After): {len(updated_sections)}")
+        print("Updated Sections List:")
+
+        print("Sections merged successfully.")
+        for sec in updated_sections:
+            print(sec)
+
     else:
-        print("No changes applied; sections remain unchanged")
+        print("\nChange not approved. No changes applied.")
 
 else:
-    print("Blog structure is fine; no changes needed")
+    print("Blog structure is fine. No changes proposed.")
+    
