@@ -3,8 +3,9 @@ with open("blog_input.txt", "r", encoding="utf-8") as file:
 
 print (blog_text[:500])
 print ("Blog content loaded successfully")
+lines = blog_text.split("\n")
 
-# I am adding a function here to count sections
+# I am adding a function here to count blog sections
 def count_sections(text): # here i am defining a function so i can reuse this block of code whenever to count sections
     lines = text.split("\n")
     count = 0
@@ -13,52 +14,73 @@ def count_sections(text): # here i am defining a function so i can reuse this bl
             count += 1
     return count 
 
-# Basic test for section count
+# testing section count
 test_text = "# Section 1\ncontent\n# Section 2\ncontent\n# Section 3\ncontent\n# Section 4\ncontent\n# Section 5\ncontent\n# Section 6\ncontent\n# Section 7\ncontent"
 assert count_sections(test_text) == 7
-print("Section counting test passed.")
+print("section counting test passed.")
 
-lines = blog_text.split("\n")
+# I am adding a function for link parsing
+def classify_link(url):
+    if url.startswith("https://") and ".com" in url:
+        return "strong"
+    elif url.startswith("http://") and ".net" in url:
+        return "weak"
+    else:
+        return "other"
 
+# classifying test link     
+assert classify_link("https://trustedsite.com/page") == "strong"
+assert classify_link("http://oldsite.net/page") == "weak"
+assert classify_link("https://example.org") == "other"
+print("Link classification test passed.")
+
+# I am applying logic to collect all section title and links
 sections = []
-current_section = [] # Adding this for content along with section title
-links = []
+current_section = []
 
 for line in lines:
-    if line.strip().startswith("#"):
-        if current_section:  # save previous section
+    line = line.strip()
+    if not line:
+        continue
+
+    if line.startswith("#"):  
+        if current_section:  
             sections.append("\n".join(current_section))
-        current_section = [line.strip()]  # start new section with heading
+        current_section = [line]  
     else:
-        current_section.append(line.strip())  # add content to current section
+        current_section.append(line)  
 
 if current_section:
     sections.append("\n".join(current_section))
 
-# Rule 1 - I am creating a simple link evaluation logic here - to access and usefulness
 
-weak_domains = ["oldsite.net"]
+links = []
 
 for line in lines:
-    if "http" in line:
-        words = line.split()
-        for word in words:
-            if word.startswith("http"):
-                url = word.strip(",.")
-                if url.startswith("http://") or any(domain in url for domain in weak_domains):
-                    print(f"Weak link detected: {url}")
-                else:
-                    print(f"Link seems reliable: {url}")
+    for words in line.split():
+        if words.startswith("http"): #links
+            url = words.strip(",.")  
+            links.append(url)
+    
+# Rule 1 - I am creating a simple link evaluation logic here - to assess and usefulness
+print("Link Evaluation Results:")
+for url in links:
+    result = classify_link(url)
+    if result == "strong":
+        print(f"Reliable link: {url}")      
+    elif result == "weak":
+        print(f"Weak link detected: {url}")
+    else:
+        print(f"Link requires manual review: {url}")
+
 
 # Rule 2 - Bringing Structure clarity - refresh blog post should be <=6 sections and decide which is to keep, rewrite or leave unchanged 
-
 num_sections = count_sections(blog_text) # earlier I was just counting a lenght of list -> len(sections) now counting using a function
 print(f"Total sections found: {num_sections}")
 
 if num_sections > 6:
 
 # I am proposing to merge the last 2 sections instead of just printing the messages - to address concrete change to meet structual clarity requirement
-    
     section1 = sections[-2]
     section2 = sections[-1]
 
@@ -73,27 +95,16 @@ if num_sections > 6:
         print("\nChange approved. Applying merge...")
 
         # simple merge logic (removing last section heading)
-        blog_text = blog_text.replace(section2, "")
-
-        # Verfication part - merged section results to be displayed to ensure whether changes are reflected to adding this)
-        updated_lines = blog_text.split("\n")
-        updated_sections = []
-
-        for line in updated_lines:
-            if line.strip().startswith("#"):
-                updated_sections.append(line.strip())
-        
-        print("\nUpdated Results:")
-        print(f"Total sections found (After): {len(updated_sections)}")
-        print("Updated Sections List:")
-
-        print("Sections merged successfully.")
-        for sec in updated_sections:
-            print(sec)
-
+        merged_section = sections[-2] + "\n" + "\n".join(sections[-1].splitlines()[1:])
+        sections = sections[:-2] # here i am removing last 2 
+        sections.append(merged_section)  
     else:
         print("\nChange not approved. No changes applied.")
 
-else:
-    print("Blog structure is fine. No changes proposed.")
-    
+# final Verfication part - After approval merged section results to be displayed to ensure whether changes are reflected so i am adding this)
+    print("\nUpdated Sections After Merge:")
+for sec in sections:
+    print(sec)
+    print()
+
+
